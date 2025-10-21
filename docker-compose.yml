@@ -53,7 +53,7 @@ services:
     networks:
       - video-analysis-network
 
-  face-detection-service:
+  face_detection_service:
     build:
       context: ./face_detection_service
       dockerfile: Dockerfile
