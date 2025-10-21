@@ -1,0 +1,152 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: video-analysis-main
+    ports:
+      - "8000:8000"
+    environment:
+      - AUDIO_SERVICE_URL= http://audio_transcription_service:8001
+      - FACE_DETECTION_SERVICE_URL=http://face_detection_service:8002
+      - TEXT_DETECTION_SERvICE_URL= http://text_detection_service:8003
+      - OBJECTS_DETECTION_AND_TRACKING_SERVICE_URL=http://objects_detection_and_tracking_service:8004
+      - ACTIVITY_ANALYSIS_SERVICE_URL=http://activity_analysis_service:8005
+      - DATABASE_URL=sqlite:///app/database/video_analysis.db
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    depends_on:
+      - audio_transcription_service
+      - face_detection_service
+      - text_detection_service
+      - objects_detection_and_tracking_service
+      - activity_analysis_service
+    networks:
+      - video-analysis-network
+
+  audio_transcription_service:
+    build:
+      context: ./audio_transcription_service
+      dockerfile: Dockerfile
+    container_name: audio_transcription_service
+    ports:
+      - "8001:8001"
+    environment:
+      - MODEL_DIR=/app/models
+      - DIVICE=cuda
+    volumes:
+      - ./models/whisper:/app/models
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - video-analysis-network
+
+  face-detection-service:
+    build:
+      context: ./face_detection_service
+      dockerfile: Dockerfile
+    container_name: face_detection_service
+    ports:
+      - "8002:8002"
+    environment:
+      - MODEL_DIR=/app/models
+      - DIVICE=cuda
+    volumes:
+      - ./models/scrfd:/app/models
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - video-analysis-network
+
+  text_detection_service:
+    build:
+      context: ./text_detection_service
+      dockerfile: Dockerfile
+    container_name: text_detection_service
+    ports:
+      - "8003:8003"
+    environment:
+      - MODEL_DIR=/app/models
+    volumes:
+      - ./models/easyocr:/app/models
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    networks:
+      - video-analysis-network
+  objects_detection_and_tracking_service:
+    build:
+      context: ./objects_detection_and_tracking_service
+      dockerfile: Dockerfile
+    container_name: objects_detection_and_tracking_service
+    ports:
+      - "8004:8004"
+    environment:
+      - MODEL_DIE=/app/models
+      - DEVICE=cuda
+    volumes:
+      - ./models/rtdetr:/app/models
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - video-analysis-network
+
+  activity_analysis_service:
+    build:
+      context: ./activity_analysis_service
+      dockerfile: Dockerfile
+    container_name: activity_analysis_service
+    ports:
+      - "8005:8005"
+    environment:
+      - MODEL_DIR=/app/models
+      - DIVICE=cuda
+    volumes:
+      - ./models/qwen:/app/models
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - video-analysis-network
+networks:
+  video-analysis-network:
+    driver: bridge
+volumes:
+  uploads:
+  outputs:
+  models:
