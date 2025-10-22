@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from config import DATABASE_CONFIG
+from shared.config import DATABASE_CONFIG
 
 
 class VideoAnalysisDB:
