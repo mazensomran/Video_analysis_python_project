@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class FaceDetector:
     def __init__(self, face_threshold=0.3):
         try:
-            self.scrfd_detector = SCRFD.from_path("../scrfd.onnx",
+            self.scrfd_detector = SCRFD.from_path("./scrfd.onnx",
                                                   providers=["CUDAExecutionProvider"])
             if self.scrfd_detector is None:
                 raise Exception("فشل تحميل نموذج SCRFD لكشف الوجوه.")
