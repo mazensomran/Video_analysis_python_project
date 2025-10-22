@@ -3,18 +3,12 @@ scrfd==0.2.1
 numpy==1.26.0
 opencv-python==4.9.0.80
 opencv-contrib-python==4.9.0.80
-scikit-learn==1.5.2
-scipy==1.14.1
-torch==2.6.0+cu124
-torchvision==0.21.0+cu124
-torchaudio==2.6.0+cu124
---extra-index-url https://download.pytorch.org/whl/cu124
 fastapi==0.115.0
 uvicorn==0.30.6
 aiohttp==3.13.1
 easyocr==1.7.1
 openai-whisper==20240930
-transformers==4.37.2
+transformers==4.56.2
 pillow==10.1.0
 python-multipart==0.0.9
 ffmpeg-python==0.2.0

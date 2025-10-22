@@ -14,12 +14,16 @@ COPY requirements.txt .
 
 # تثبيت Python dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==2.6.0+cu124 torchaudio==2.6.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
+RUN pip3 install --no-cache-dir \
+    torch==2.4.1+cu118 \
+    torchvision==0.19.1+cu118 \
+    torchaudio==2.4.1+cu118 \
+    --extra-index-url https://download.pytorch.org/whl/cu118
 RUN pip3 install -r requirements.txt
 
 # نسخ الكود
-COPY audio_model.py .
-COPY audio_service.py .
+COPY ./audio_transcription_service/app/audio_model.py .
+COPY ./audio_transcription_service/app/audio_service.py .
 COPY shared ./shared
 
 # تعيين البيئة

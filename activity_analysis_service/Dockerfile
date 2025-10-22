@@ -11,16 +11,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # نسخ المتطلبات
-COPY requirements.txt .
+COPY ./activity_analysis_service/requirements.txt .
 
 # تثبيت Python dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==2.6.0+cu124 torchvision==0.21.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
+RUN pip3 install --no-cache-dir \
+    torch==2.4.1+cu118 \
+    torchvision==0.19.1+cu118 \
+    --extra-index-url https://download.pytorch.org/whl/cu118
 RUN pip3 install -r requirements.txt
 
 # نسخ الكود
-COPY activity_model.py .
-COPY activity_service.py .
+COPY ./activity_analysis_service/app/activity_model.py .
+COPY ./activity_analysis_service/app/activity_service.py .
 COPY shared ./shared
 
 # تعيين البيئة

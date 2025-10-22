@@ -10,16 +10,20 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # نسخ المتطلبات
-COPY requirements.txt .
+COPY ./objects_detection_and_tracking_service/requirements.txt .
 
 # تثبيت Python dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==2.6.0+cu124 torchvision==0.21.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
+RUN pip3 install --no-cache-dir \
+    torch==2.4.1+cu118 \
+    torchvision==0.19.1+cu118 \
+    torchaudio==2.4.1+cu118 \
+    --extra-index-url https://download.pytorch.org/whl/cu118
 RUN pip3 install -r requirements.txt
 
 # نسخ الكود
-COPY objects_model.py .
-COPY objects_service.py .
+COPY ./objects_detection_and_tracking_service/app/objects_model.py .
+COPY ./objects_detection_and_tracking_service/app/objects_service.py .
 COPY shared ./shared
 
 # تعيين البيئة
