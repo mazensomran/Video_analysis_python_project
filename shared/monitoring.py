@@ -1,8 +1,8 @@
 import time
 import threading
 from typing import Dict, Any
-from database import db
-from config import PROCESSING_CONFIG
+from shared.database import db
+from shared.config import PROCESSING_CONFIG
 
 
 class ProcessMonitor:
