@@ -1,6 +1,6 @@
 supervision==0.22.0
 scrfd==0.2.1
-numpy== 1.24.4
+numpy== 1.26.0
 opencv-python==4.9.0.80
 opencv-contrib-python==4.9.0.80
 fastapi==0.115.0
