@@ -7,6 +7,6 @@ opencv-python==4.9.0.80
 opencv-contrib-python==4.9.0.80
 pillow==10.1.0
 scrfd==0.2.1
-numpy==1.26.0
+numpy== 1.24.4
 aiohttp==3.13.1
 psutil==5.9.8
