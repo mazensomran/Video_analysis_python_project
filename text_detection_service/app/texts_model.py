@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 class TextDetector:
     def __init__(self, text_threshold=0.3):
-        self.reader = easyocr.Reader(['en', 'ar'], gpu=(self.device == "gpu"))
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.reader = None
         self.detection_threshold = text_threshold
         self.min_text_confidence = 0.3
         self.languages = ['ar', 'en']
@@ -32,14 +33,13 @@ class TextDetector:
             model_dir = Path(EASYOCR_CONFIG["model_storage_directory"])
             model_dir.mkdir(parents=True, exist_ok=True)
 
-            # ✅ التصحيح: استخدام المعلمات الصحيحة
             self.reader = easyocr.Reader(
                 lang_list=self.languages,
                 gpu=gpu,
                 model_storage_directory=str(model_dir),
                 download_enabled=EASYOCR_CONFIG["download_enabled"],
-                detector=EASYOCR_CONFIG["detector"],  # ✅ تصحيح اسم المعلمة
-                recognizer=EASYOCR_CONFIG["recognizer"]  # ✅ تصحيح اسم المعلمة
+                detector=True,
+                recognizer=True
             )
 
             logger.info(f"✅ تم تحميل EasyOCR بنجاح على {'GPU' if gpu else 'CPU'}")
