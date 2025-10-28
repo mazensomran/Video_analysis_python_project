@@ -1,17 +1,10 @@
-
-import torch
-from transformers import AutoImageProcessor
-import whisper
-import os
 from pathlib import Path
 import requests
-import time
 from typing import Optional, List, Dict, Any, Tuple
 import logging
-from config import MODELS_DIR, MODEL_CONFIG, PROCESSING_CONFIG, GPU_AVAILABLE
+from shared.config import MODELS_DIR, MODEL_CONFIG, PROCESSING_CONFIG, GPU_AVAILABLE
 from transformers import AutoProcessor, AutoModelForVision2Seq
 from transformers import Qwen2VLForConditionalGeneration, Qwen2VLProcessor
-from scrfd import SCRFD, Threshold
 import torch
 # إعداد التسجيل
 logger = logging.getLogger(__name__)
@@ -67,65 +60,6 @@ class ModelLoader:
                 torch.backends.cudnn.allow_tf32 = True
 
 
-    def load_scrfd_model(self, model_path: Optional[Path] = None) -> Optional[SCRFD]:
-        # إذا لم يُمرر مسار، استخدم المسار الافتراضي من الإعدادات
-        if model_path is None:
-            model_path = MODEL_CONFIG["scrfd_model_path"]
-        # تحويل model_path إلى كائن Path إذا كان str
-        if isinstance(model_path, str):
-            model_path = Path(model_path)
-        # (اختياري) استخدام التخزين المؤقت
-        cache_key = f"scrfd_{model_path.name}"
-        if cache_key in self.model_cache:
-            return self.model_cache[cache_key]
-        try:
-            if not model_path.exists():
-                print(f"⚠️ نموذج SCRFD غير موجود في المسار: {model_path}. يرجى تنزيله يدوياً.")
-                return None
-            print(f"📂 تحميل نموذج SCRFD من التخزين المحلي: {model_path.name}")
-            model = SCRFD.from_path(str(model_path))
-            self.model_cache[cache_key] = model
-            print(f"✅ تم تحميل نموذج SCRFD بنجاح.")
-            return model
-        except Exception as e:
-            print(f"❌ خطأ في تحميل SCRFD: {e}")
-            return None
-
-    def load_whisper_model(self, model_name: str = None) -> Optional[Any]:
-        """تحميل نموذج Whisper"""
-        if model_name is None:
-            model_name = MODEL_CONFIG["speech_recognition_model"]
-
-        cache_key = f"whisper_{model_name}"
-        if cache_key in self.model_cache:
-            return self.model_cache[cache_key]
-
-        try:
-            print(f"📥 تحميل نموذج Whisper: {model_name}")
-
-            # التحقق من أن النموذج متاح
-            available_models = MODEL_CONFIG["available_whisper_models"]
-            if model_name not in available_models:
-                print(f"⚠️ النموذج {model_name} غير متاح، استخدام 'base' بدلاً منه")
-                model_name = "base"
-
-            # تحميل النموذج مع استخدام float32
-            model = whisper.load_model(
-                model_name,
-                download_root=str(self.models_dir / "whisper"),
-                device=self.device
-            )
-
-            # استخدام float32 بدلاً من half لتجنب المشاكل
-            model = model.float()
-
-            self.model_cache[cache_key] = model
-            print(f"✅ تم تحميل Whisper ({model_name}) بنجاح على {self.device}")
-            return model
-
-        except Exception as e:
-            print(f"❌ خطأ في تحميل Whisper: {e}")
-            return None
 
     def load_qwen2_vl_model(self, model_name: str = "Qwen/Qwen2-VL-2B-Instruct"):
         """تحميل نموذج Qwen2-VL لتوليد الوصف"""
@@ -201,16 +135,6 @@ class ModelLoader:
             torch.cuda.empty_cache()
         print("🧹 تم تنظيف جميع موارد ModelLoader")
 
-
-def load_text_recognition_model():
-    """تحميل نموذج التعرف على النص"""
-    # سيتم التعامل مع EasyOCR في مكان آخر
-    return None
-
-
-def load_speech_recognition_model():
-    """تحميل نموذج التعرف على الكلام"""
-    return model_loader.load_whisper_model()
 
 
 # إنشاء loader عالمي
