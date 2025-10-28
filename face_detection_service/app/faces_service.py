@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import tempfile
 import os
@@ -7,9 +8,26 @@ import logging
 
 from faces_model import FaceDetector
 
+def setup_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+setup_logging()
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="خدمة كشف الوجوه في الصور والفيديوهات")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 detector = FaceDetector()
 
@@ -43,7 +61,26 @@ async def detect_faces(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"خطأ في المعالجة: {str(e)}")
 
+    finally:
+        # تنظيف الملف المؤقت في جميع الحالات
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception as e:
+                logger.warning(f"⚠️ فشل في تنظيف الملف المؤقت: {e}")
+
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "face", "model_loaded": detector is not None}
+    """فحص صحة الخدمة"""
+    status = "healthy" if detector and detector.scrfd_detector else "unhealthy"
+    return {
+        "status": status,
+        "service": "activity-analysis",
+        "model_loaded": detector is not None and detector.scrfd_detector is not None
+    }
+
+
+@app.get("/")
+async def root():
+    return {"message": "خدمة كشف الوجوه تعمل"}
