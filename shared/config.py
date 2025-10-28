@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 # المسارات الأساسية
 BASE_DIR = Path(__file__).resolve().parent
 
-WORKING_DIR = Path("/kaggle/working/") # تعريف مجلد العمل الجديد
+#WORKING_DIR = Path("/kaggle/working/") # تعريف مجلد العمل الجديد ل kaggle
 UPLOAD_DIR = BASE_DIR / "uploads"
 OUTPUTS_DIR = BASE_DIR / "outputs"
 MODELS_DIR = BASE_DIR / "models" # يمكن أن يكون هذا داخل WORKING_DIR أو يبقى في BASE_DIR إذا كانت النماذج محملة مسبقًا
@@ -32,7 +32,7 @@ if GPU_AVAILABLE:
 
 # إعدادات التطبيق
 APP_CONFIG = {
-    "host": "127.0.0.1",
+    "host": "0.0.0.0",
     "port": 8000,
     "debug": True,
     "max_file_size": 100 * 1024 * 1024,  # 100MB
@@ -103,24 +103,7 @@ PROCESSING_CONFIG = {
 # إعدادات النماذج
 MODEL_CONFIG = {
     # نماذج كشف الوجوه
-    "face_detection_model": "yolov8m-face.pt",
     "scrfd_model_path": "sscrfd.onnx",
-    "available_face_models": [
-        "yolov8n-face.pt",
-        "yolov8s-face.pt",
-        "yolov8m-face.pt",
-        "yolov8l-face.pt"
-    ],
-
-    # نماذج كشف الأشخاص
-    "person_detection_model": "yolov8s.pt",
-    "available_person_models": [
-        "yolov8n.pt",
-        "yolov8s.pt",
-        "yolov8m.pt",
-        "yolov8l.pt",
-        "yolov8x.pt"
-    ],
 
     # نماذج التعرف على النص
     "text_detection_model": "easyocr",
@@ -135,15 +118,6 @@ MODEL_CONFIG = {
         "small", "small.en",
         "medium", "medium.en",
         "large", "large-v1", "large-v2", "large-v3"
-    ],
-
-    # نماذج التعرف على المشهد والنشاط
-    "scene_recognition_model": "Salesforce/blip-image-captioning-base",
-    "activity_recognition_model": "Salesforce/blip-image-captioning-base",
-    "available_scene_models": [
-        "Salesforce/blip-image-captioning-base",
-        "google/vit-base-patch16-224",
-        "facebook/convnext-tiny-224"
     ],
 
     # نماذج التتبع
@@ -161,13 +135,6 @@ MODEL_CONFIG = {
     "model_download_timeout": 300,  # 5 دقائق
     "model_retry_attempts": 3,
     "model_cache_size": 1024 * 1024 * 1024,  # 1GB
-
-# نماذج التعرف على النشاط (Video Swin Transformer)
-    "video_activity_model": "microsoft/video-swin-tiny-patch4-window7-224", # نموذج صغير وسريع للبدء
-    "available_video_activity_models": [
-        "microsoft/video-swin-tiny-patch4-window7-224",
-        "microsoft/video-swin-base-patch4-window7-224"]
-}
 
 # إعدادات EasyOCR
 EASYOCR_CONFIG = {
@@ -317,11 +284,6 @@ def check_processing_config() -> bool:
             MODEL_CONFIG["face_detection_model"],
             MODEL_CONFIG["person_detection_model"],
         ]
-
-        print("🔍 التحقق من إعدادات المعالجة...")
-        print(f"📁 مجلد النماذج: {MODELS_DIR}")
-        print(f"🎯 GPU متاح: {GPU_AVAILABLE}")
-        print(f"⚡ وضع المعالجة: {'سريع' if PROCESSING_CONFIG['enable_fast_processing'] else 'عادي'}")
 
         return True
 
