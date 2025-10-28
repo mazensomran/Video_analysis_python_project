@@ -1,3 +1,4 @@
+import time
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Form
 from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
@@ -954,7 +955,7 @@ HTML_TEMPLATE = """
                 grid-template-columns: 1fr;
             }
         }
-        
+
                 /* تنسيق قسم الضبط المتقدم */
         .advanced-settings {
             background: #f8f9fa;
@@ -1075,12 +1076,12 @@ HTML_TEMPLATE = """
                                 <option value="temporal">⏰ التحليل الزمني والتسلسلي للأحداث</option>
                                 <option value="custom">✏️ تخصيص يدوي (اكتب Prompt خاص)</option>
                             </select>
-                            
+
                             <div id="customPromptContainer" class="hidden" style="margin-top: 10px;">
                                 <label for="activityPrompt">أدخل الـ Prompt المخصص:</label>
                                 <textarea id="activityPrompt" rows="3" class="form-control" placeholder="اكتب مطالبة مفصلة هنا..."></textarea>
                             </div>
-                            
+
                             <div id="presetDescription" class="status-message status-info" style="margin-top: 10px; font-size: 0.9em;">
                                 <strong>التحليل الشامل للأدلة الجنائية:</strong> تحليل كامل للفيديو يشمل البيئة، الأشخاص، الأنشطة المشبوهة، وجمع الأدلة
                             </div>
@@ -1089,17 +1090,16 @@ HTML_TEMPLATE = """
                             <label for="activityFps">دقة التحليل (FPS):</label>
                             <input type="number" id="activityFps" class="form-control" value="1" min="1" step="1">
                         </div>
-                        <!-- إضافة قسم الضبط المتقدم -->
                         <div class="option-item hidden" id="advancedSettingsContainer">
                             <h4>⚙️ ضبط متقدم</h4>
                             <div class="options-grid">
-                            
+
                                 <div class="option-item">
                                     <input type="checkbox" id="enable_video_enhancement">
                                     <label for="enable_video_enhancement">🎨 تحسين جودة الفيديو (للفيديوهات منخفضة الدقة)</label>
                                     <small>يحسن وضوح الفيديو قبل التحليل - يستهلك ذاكرة إضافية</small>
                                 </div>
-                        
+
                                 <div class="option-item hidden" id="enhancementStrengthContainer">
                                     <label for="enhancementStrength">قوة التحسين (1-5):</label>
                                     <input type="range" id="enhancementStrength" min="1" max="5" step="1" value="2" class="slider">
@@ -1115,7 +1115,7 @@ HTML_TEMPLATE = """
                                     <input type="checkbox" id="doSample">
                                     <label for="doSample">Do Sample</label>
                                 </div>
-                                
+
                                 <div class="option-item">
                                     <label for="temperature">Temperature (0-1):</label>
                                     <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.2" class="slider">
@@ -1373,17 +1373,17 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
                 slider.disabled = true;
             }
         });
-        
+
         // التحكم في خيار تحسين الفيديو
         const enableVideoEnhancement = document.getElementById('enable_video_enhancement');
         const enhancementContainer = document.getElementById('enhancementStrengthContainer');
-        
+
         if (enableVideoEnhancement && enhancementContainer) {
             // تعيين الحالة الافتراضية
             if (!enableVideoEnhancement.checked) {
                 enhancementContainer.classList.add('hidden');
             }
-            
+
             // إضافة event listener
             enableVideoEnhancement.addEventListener('change', function() {
                 if (this.checked) {
@@ -1501,16 +1501,16 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         function updateSliderValue(sliderId, valueId) {
             const slider = document.getElementById(sliderId);
             const valueSpan = document.getElementById(valueId);
-            
+
             if (slider && valueSpan) {
                 // تعيين القيمة الأولية
                 valueSpan.textContent = slider.value;
-                
+
                 // إضافة event listener للتحديث عند التغيير
                 slider.addEventListener('input', function() {
                     valueSpan.textContent = this.value;
                 });
-                
+
                 // أيضًا تحديث عند تحرير السلايدر
                 slider.addEventListener('change', function() {
                     valueSpan.textContent = this.value;
@@ -1523,7 +1523,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         updateSliderValue('objectThreshold', 'objectThresholdValue');
         // ✅ تحديث قيم سلايدرز الضبط المتقدم
         setupAdvancedSettingsSliders();
-    
+
         // ✅ تحميل الـ Prompt الافتراضي
         loadPromptPreset('forensic');
 
@@ -1546,14 +1546,14 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         const enableFacesCheckbox = document.getElementById('enableFaces');
         const faceThresholdContainer = document.getElementById('faceThresholdContainer');
         const faceThresholdSlider = document.getElementById('faceThreshold');
-        
+
         if (enableFacesCheckbox && faceThresholdContainer) {
             // تعيين الحالة الافتراضية
             if (!enableFacesCheckbox.checked) {
                 faceThresholdContainer.classList.add('hidden');
                 if (faceThresholdSlider) faceThresholdSlider.disabled = true;
             }
-            
+
             // إضافة event listener
             enableFacesCheckbox.addEventListener('change', function() {
                 if (this.checked) {
@@ -1565,18 +1565,18 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
                 }
             });
         }
-    
+
         // التحكم في عتبة النصوص
         const enableTextCheckbox = document.getElementById('enableText');
         const textThresholdContainer = document.getElementById('textThresholdContainer');
         const textThresholdSlider = document.getElementById('textThreshold');
-        
+
         if (enableTextCheckbox && textThresholdContainer) {
             if (!enableTextCheckbox.checked) {
                 textThresholdContainer.classList.add('hidden');
                 if (textThresholdSlider) textThresholdSlider.disabled = true;
             }
-            
+
             enableTextCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     textThresholdContainer.classList.remove('hidden');
@@ -1587,18 +1587,18 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
                 }
             });
         }
-    
+
         // التحكم في عتبة الكائنات
         const enableTrackingCheckbox = document.getElementById('enableTracking');
         const objectThresholdContainer = document.getElementById('objectThresholdContainer');
         const objectThresholdSlider = document.getElementById('objectThreshold');
-        
+
         if (enableTrackingCheckbox && objectThresholdContainer) {
             if (!enableTrackingCheckbox.checked) {
                 objectThresholdContainer.classList.add('hidden');
                 if (objectThresholdSlider) objectThresholdSlider.disabled = true;
             }
-            
+
             enableTrackingCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     objectThresholdContainer.classList.remove('hidden');
@@ -1609,20 +1609,20 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
                 }
             });
         }
-    
+
         // التحكم في عناصر تحليل النشاط
         const enableActivityCheckbox = document.getElementById('enableActivity');
         const activityPromptContainer = document.getElementById('activityPromptContainer');
         const activityFpsContainer = document.getElementById('activityFpsContainer');
         const advancedSettingsContainer = document.getElementById('advancedSettingsContainer');
-        
+
         if (enableActivityCheckbox && activityPromptContainer) {
             if (!enableActivityCheckbox.checked) {
                 activityPromptContainer.classList.add('hidden');
                 activityFpsContainer.classList.add('hidden');
                 advancedSettingsContainer.classList.add('hidden');
             }
-            
+
             enableActivityCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     activityPromptContainer.classList.remove('hidden');
@@ -1706,7 +1706,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
             }
         }
     }
-    
+
     // تعريف الـ Prompts المحددة مسبقاً
     const promptPresets = {
         'forensic': `You are a forensic video analysis expert. Analyze this surveillance footage systematically with focus on detecting crimes and illegal activities:
@@ -1715,17 +1715,17 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         - Describe location, time, lighting conditions, and weather
         - Identify venue type (store, street, building, etc.)
         - Note visible landmarks, signs, or distinctive features
-        
+
         **👥 Suspect Person Analysis:**
         - Count and describe all individuals (approximate age, gender, clothing, distinctive features)
         - Identify masked individuals, people wearing unusual clothing, or attempting to conceal identity
         - Track movements and interactions between people
-        
+
         **🚨 Criminal Activities - Priority Detection:**
         🔴 **Critical Events:** Weapons presence, assaults, fights, shootings, kidnappings, armed robberies
         🟡 **Suspicious Behaviors:** Unauthorized entry, property damage, theft, hiding objects, rapid movements
         🟢 **Unusual Patterns:** Loitering, frequent coming/going, abandoned objects, vehicle circling
-        
+
         **⚖️ Specific Criminal Indicators:**
         - Carrying bladed weapons or firearms
         - Breaking locks or doors
@@ -1733,150 +1733,150 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         - Physical assault on persons
         - Exchange of suspicious materials (drugs)
         - Use of force or threats
-        
+
         **⏱️ Temporal Analysis:**
         - Record exact timestamps of significant events
         - Document sequence of critical incidents
         - Identify timing patterns in activities
-        
+
         **📸 Evidence Collection:**
         - License plates, vehicle descriptions
         - Clear faces (quality assessment for identification)
         - Objects carried or exchanged
         - Digital evidence (phones, cameras in use)
-        
+
         Provide detailed description and confidence levels for each observation. Highlight the three most serious incidents requiring immediate investigation.`,
-        
+
             'threats': `As a security threat detection specialist, focus specifically on:
-        
+
         **🔫 Weapons & Dangerous Objects:**
         - Firearms (handguns, rifles, shotguns)
         - Knives, sharp objects, hazardous materials
         - Explosives, suspicious packages
         - Tools used for breaking/entering (crowbars, hammers)
-        
+
         **🚩 Threat Indicators:**
         - Aggressive body language, fighting stances
         - Concealed hands, clothing bulges suggesting hidden objects
         - Protective gear (gloves, masks, helmets)
         - Coordinated group movements suggesting planned action
-        
+
         **⚠️ Imminent Danger Signals:**
         - Hostage situations, physical restraints
         - Panic reactions from bystanders
         - Rapid evacuation or hiding behaviors
         - Sounds of gunshots, screams, breaking glass
-        
+
         **👮 Response Assessment:**
         - Police/security presence and response time
         - Civilian reactions and escape patterns
         - Medical emergency responses
-        
+
         Provide detailed description with confidence levels for each observation. Prioritize immediate threats and provide practical recommendations for law enforcement responses.`,
-        
+
             'theft': `Focus on property crimes and theft detection:
-        
+
         **🛍️ Theft Behaviors:**
         - Shoplifting: concealing merchandise, avoiding cameras
         - Bag/package tampering
         - Unauthorized access to restricted areas
         - Breaking into vehicles or buildings
-        
+
         **💥 Property Assault:**
         - Vandalism: graffiti, broken windows, damaged property
         - Forced entry: broken locks, pried doors
         - Arson attempts, fire-related activities
-        
+
         **👥 Accomplice Patterns:**
         - Lookouts/distractions working with perpetrators
         - Getaway vehicles and drivers
         - Signal systems between individuals
-        
+
         **📹 Evidence Collection:**
         - Clear facial captures of perpetrators
         - Vehicle make/model/color/license plates
         - Stolen items description and handling
         - Escape routes and directions
-        
+
         Provide detailed description, specifying confidence levels for each observation. Document the complete crime timeline from preparation to escape.`,
-        
+
             'behavior': `Analyze behavioral patterns and suspicious movements:
-        
+
         **🤔 Suspicious Behavioral Cues:**
         - Nervousness: frequent looking around, checking watches
         - Attempted disguise: hats, sunglasses, masks in inappropriate contexts
         - Unnatural loitering without clear purpose
         - Testing security measures (checking doors, cameras)
-        
+
         **🚶 Movement Analysis:**
         - Erratic or evasive walking patterns
         - Rapid direction changes to avoid detection
         - Crouching, hiding, or moving in shadows
         - Unusual gathering/dispersal patterns
-        
+
         **🔍 Pre-incident Indicators:**
         - Surveillance of locations (casing)
         - Equipment preparation (putting on gloves, masks)
         - Communication signals (phone calls, hand signals)
         - Positioning for ambush or attack
-        
+
         **🎭 Contextual Abnormalities:**
         - Inappropriate clothing for weather/occasion
         - Carrying unusual objects for the location
         - Mismatched group behavior (some watching while others act)
-        
+
         Provide detailed description with confidence levels for each observation, and suggest follow-up monitoring actions.`,
-        
+
             'temporal': `Conduct detailed temporal analysis of events:
-        
+
         **⏰ Chronological Event Mapping:**
         - Create minute-by-minute timeline of significant activities
         - Document exact sequence of critical incidents
         - Note duration of suspicious activities
-        
+
         **🔄 Pattern Recognition:**
         - Repetitive behaviors or regular visits
         - Timing correlations between different individuals
         - Peak activity periods and lulls
-        
+
         **🔗 Cause-and-Effect Analysis:**
         - Trigger events initiating suspicious activities
         - Chain reactions between different parties
         - Response patterns to external stimuli
-        
+
         **⏱️ Timing Anomalies:**
         - Activities occurring at unusual hours
         - Synchronized actions between distant individuals
         - Precise timing suggesting planning/rehearsal
-        
+
         **📊 Evidence Timeline:**
         - First/last appearance of key individuals
         - Time windows for critical evidentiary moments
         - Duration of observable criminal acts
-        
+
         Provide detailed description and confidence levels for each observation, presenting results in timeline format consistent with event sequence and video frames.`,
-        
+
         'emergency': `🔴 Emergency Analysis - For Immediate Response:
-        
+
         **🚨 Immediate Danger Assessment:**
         - Is there immediate danger to lives?
         - Are there injuries or need for medical assistance?
         - Is the crime still ongoing?
-        
+
         **📞 Urgent Contact Information:**
         - Exact location of incident
         - Number of suspects and movement direction
         - Type of weapons used (if any)
         - Number and condition of victims
-        
+
         **🎯 Response Priorities:**
         - Secure area and protect civilians
         - Track and contain suspects
         - Provide urgent medical assistance
         - Preserve crime scene
-        
+
         Provide brief emergency report with most critical information for immediate response.`};
-    
+
     // أوصاف الـ Prompts
     const promptDescriptions = {
         'forensic': 'التحليل الجنائي الشامل: فحص كامل للفيديو مع التركيز على الأدلة الجنائية والأنشطة الإجرامية',
@@ -1887,13 +1887,13 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         'emergency': 'الطوارئ والاستجابة السريعة: لتقييم المواقف الخطرة فورياً',
         'custom': 'التخصيص اليدوي: اكتب الـ Prompt الذي تريد استخدامه بشكل مخصص'
     };
-    
+
     // تحميل الـ Prompt المحدد
     function loadPromptPreset(presetValue) {
         const customContainer = document.getElementById('customPromptContainer');
         const descriptionDiv = document.getElementById('presetDescription');
         const promptTextarea = document.getElementById('activityPrompt');
-        
+
         if (presetValue === 'custom') {
             // إظهار حقل الإدخال المخصص
             customContainer.classList.remove('hidden');
@@ -1907,7 +1907,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
             descriptionDiv.innerHTML = `<strong>${getPresetDisplayName(presetValue)}:</strong> ${promptDescriptions[presetValue]}`;
         }
     }
-    
+
     // الحصول على الاسم المعروض للـ Prompt
     function getPresetDisplayName(presetValue) {
         const presetNames = {
@@ -1997,11 +1997,11 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         formData.append('text_threshold', document.getElementById('textThreshold').value);
         formData.append('object_threshold', document.getElementById('objectThreshold').value);
         formData.append('detection_step', document.getElementById('detectionStep').value || 1);
-        
+
         if (document.getElementById('enableActivity').checked) {
             formData.append('activity_prompt', document.getElementById('activityPrompt').value);
             formData.append('activity_fps', document.getElementById('activityFps').value);
-            
+
             // إضافة معاملات الضبط المتقدم
             formData.append('max_new_tokens', document.getElementById('maxNewTokens').value);
             formData.append('temperature', document.getElementById('temperature').value);
@@ -2129,6 +2129,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
             }
         } catch (error) {
             showStatus('خطأ في جلب النتائج', 'error');
+            console.error('Error fetching results:', error);
         }
     }
 
@@ -2155,16 +2156,19 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
     // إضافة الجدول التفاعلي
     html += createInteractiveTable(results);
 
+    totalFaces = results.faces_data ? results.faces_data.length : 0;
 
+    // إصلاح مسار الفيديو
     const analyzedVideoPath = results.analyzed_video_path 
-    ? `/outputs/${currentProcessId}/${results.analyzed_video_path}`
-    : `/outputs/${currentProcessId}/video/analyzed_video.mp4`;
-
+        ? `/outputs/${currentProcessId}/${results.analyzed_video_path}`
+        : `/outputs/${currentProcessId}/video/analyzed_video_web.mp4`;
+    
+        // إضافة timestamp لمنع التخزين المؤقت
     const videoWithTimestamp = `${analyzedVideoPath}?t=${Date.now()}`;
+    
     const facesFolderPath = `/outputs/${currentProcessId}/faces/`;
     const outputFolderPath = `/outputs/${currentProcessId}/`;
-    
-    currentFacesPage = 1; 
+
     const facesPerPageSelect = document.getElementById('facesPerPageSelect');
     facesPerPage = facesPerPageSelect ? parseInt(facesPerPageSelect.value) : 4;
 
@@ -2172,6 +2176,14 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
     parseInt(document.getElementById('maxFacesDisplay').value) || 4 : 4;
     // عرض الوجوه مع التقليب
     const totalPages = Math.ceil(totalFaces / facesPerPage);
+
+    // التأكد من أن الصفحة الحالية ضمن النطاق الصحيح
+    if (currentFacesPage > totalPages && totalPages > 0) {
+        currentFacesPage = totalPages;
+    } else if (currentFacesPage < 1 && totalFaces > 0) {
+        currentFacesPage = 1;
+    }
+
     const startIndex = (currentFacesPage - 1) * facesPerPage;
     const endIndex = Math.min(startIndex + facesPerPage, totalFaces);
     const currentPageFaces = results.faces_data ? results.faces_data.slice(startIndex, endIndex) : [];
@@ -2205,7 +2217,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
                     </select>
                 </div>
             </div>
-    
+
             ${currentPageFaces.length > 0 ? `
                 <div class="face-grid">
                     ${currentPageFaces.map(face => `
@@ -2335,10 +2347,10 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
     function changeFacesPage(direction) {
         const newPage = currentFacesPage + direction;
         const totalPages = Math.ceil(totalFaces / facesPerPage);
-        
+
         if (newPage >= 1 && newPage <= totalPages) {
             currentFacesPage = newPage;
-            // إعادة تحميل النتائج
+            // إعادة تحميل النتائج مع الحفاظ على حالة الصفحة
             fetchResults(currentProcessId);
         }
     }
@@ -2381,15 +2393,11 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         addRow('النصوص المكتشفة', results.texts_detected || 0);
         addRow('مسارات التتبع', results.tracks_detected || 0);
         addRow('الكائنات المكتشفة', results.objects_detected && results.objects_detected[1] ? results.objects_detected[1].join(', ') : 'لا يوجد');
-        addRow('الكائنات المكتشفة (عربي)', results.objects_detected && results.objects_ar ? results.objects_ar.join(', ') : 'لا يوجد');
 
         // Add activity analysis data
         if (results.activity_analysis) {
                 addRow('تحليل النشاط والبيئة (انجليزي)', results.activity_analysis.activity_analysis_en || 'غير معروف');
-                addRow('تحليل النشاط والبيئة (عربي)', results.activity_analysis.activity_analysis_ar || 'غير معروف');
 
-                if (results.processing_duration_seconds) {
-                    addRow('زمن المعالجة', formatDuration(results.processing_duration_seconds));
                 }
         }
 
@@ -2400,7 +2408,8 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
         } else {
             addRow('النسخ الصوتي', 'غير متاح');
         }
-
+        if (results.processing_duration_seconds) {
+            addRow('زمن المعالجة', formatDuration(results.processing_duration_seconds));
         addRow('تاريخ المعالجة', results.processing_date || 'غير معروف');
 
         tableHtml += `
@@ -2622,16 +2631,20 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
 
     // إنشاء مشغل الفيديو مع عناصر التحكم
     function createVideoPlayer(results) {
+        // استخدام المسار الصحيح للفيديو المحول
         const analyzedVideoPath = results.analyzed_video_path 
             ? `/outputs/${currentProcessId}/${results.analyzed_video_path}`
-            : `/outputs/${currentProcessId}/video/analyzed_video.mp4`;
-
+            : `/outputs/${currentProcessId}/video/analyzed_video_web.mp4`;
+    
+        // إضافة timestamp لمنع التخزين المؤقت
+        const videoWithTimestamp = `${analyzedVideoPath}?t=${Date.now()}`;
+    
         return `
         <div class="result-card">
             <h3>🎥 الفيديو المحلل</h3>
             <div class="video-container">
-                <video id="mainVideo" class="video-preview" controls preload="metadata">
-                    <source src="${analyzedVideoPath}?t=${Date.now()}" type="video/mp4">
+                <video id="mainVideo" class="video-preview" controls preload="metadata" playsinline>
+                    <source src="${videoWithTimestamp}" type="video/mp4">
                     متصفحك لا يدعم تشغيل الفيديو.
                 </video>
                 <div class="video-controls">
@@ -3138,27 +3151,27 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
             { id: 'topK', valueId: 'topKValue' },
             { id: 'enhancementStrength', valueId: 'enhancementStrengthValue' }
         ];
-    
+
         advancedSliders.forEach(slider => {
             updateAdvancedSliderValue(slider.id, slider.valueId);
         });
     }
-    
+
     // دالة مخصصة لتحديث قيم الضبط المتقدم
     function updateAdvancedSliderValue(sliderId, valueId) {
         const slider = document.getElementById(sliderId);
         const valueSpan = document.getElementById(valueId);
-        
+
         if (slider && valueSpan) {
             // تحديث القيمة فوراً عند التحميل
             valueSpan.textContent = slider.value;
-            
+
             // إضافة مستمع event للتحديث عند التغيير
             slider.addEventListener('input', function() {
                 valueSpan.textContent = this.value;
                 console.log(`✅ ${sliderId} updated to: ${this.value}`); // للتdebug
             });
-            
+
             // إضافة مستمع event للتحديث عند تغيير الزر أيضاً
             slider.addEventListener('change', function() {
                 valueSpan.textContent = this.value;
@@ -3167,7 +3180,7 @@ curl -X POST "{{base_url}}/stop-analysis/process_id"</code></pre>
             console.error(`❌ Element not found: ${sliderId} or ${valueId}`);
         }
     }
-    
+
 </script>
 </body>
 </html>
@@ -3203,12 +3216,6 @@ async def get_active_processes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"خطأ في الحصول على العمليات النشطة: {str(e)}")
 
-# عناوين الخدمات
-'''AUDIO_SERVICE_URL = "http://audio_transcription_service:8001"
-FACE_SERVICE_URL = "http://face_detection_service:8002"
-TEXT_SERVICE_URL = "http://text_detection_service:8003"
-OBJECT_SERVICE_URL = "http://objects_detection_and_tracking_service:8004"
-ACTIVITY_SERVICE_URL = "http://activity_analysis_service:8005"'''
 
 SERVICE_CONFIG = {
     "audio": {"url": "http://audio_transcription_service:8001", "timeout": 300},
@@ -3221,41 +3228,186 @@ SERVICE_CONFIG = {
 import asyncio
 import aiohttp
 
+# دالة انتظار جاهزية الخدمة
+async def wait_for_service(service_name: str, max_retries: int = 10, delay: int = 5) -> bool:
+    """
+    تنتظر حتى تكون الخدمة جاهزة من خلال التحقق من نقطة نهاية /health.
+
+    :param service_name: اسم الخدمة (مثل 'activity')
+    :param max_retries: عدد المحاولات القصوى (افتراضي: 10)
+    :param delay: التأخير بين المحاولات بالثواني (افتراضي: 5)
+    :return: True إذا كانت الخدمة جاهزة، False إلا
+    """
+    service_config = SERVICE_CONFIG.get(service_name)
+    if not service_config:
+        logger.error(f"❌ Service {service_name} not found in SERVICE_CONFIG")
+        return False
+
+    health_url = f"{service_config['url']}/health"
+
+    for attempt in range(max_retries):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(health_url, timeout=5) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data.get("status") == "healthy":
+                            logger.info(f"✅ Service {service_name} is ready (attempt {attempt + 1})")
+                            return True
+                        else:
+                            logger.warning(f"⚠️ Service {service_name} health check failed: {data}")
+                    else:
+                        logger.warning(f"⚠️ Service {service_name} returned status {response.status}")
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+            logger.warning(f"⚠️ Attempt {attempt + 1} failed for {service_name}: {e}")
+
+        # انتظر قبل المحاولة التالية
+        await asyncio.sleep(delay)
+
+    logger.error(f"❌ Service {service_name} is not ready after {max_retries} attempts")
+    return False
+
 
 async def call_service(service_name: str, endpoint: str, files=None, data=None):
     """دالة مساعدة للاتصال بالخدمات"""
+
+    if not await wait_for_service(service_name, max_retries=10, delay=5):
+        logger.error(f"❌ Service {service_name} is not ready, skipping call")
+        return None
+
     service_config = SERVICE_CONFIG[service_name]
+    max_retries = 3
+    retry_delay = 5
+
+    for attempt in range(max_retries):
+        try:
+            async with aiohttp.ClientSession() as session:
+                form_data = aiohttp.FormData()
+
+                # إضافة الملفات إذا كانت موجودة
+                if files:
+                    for key, file_info in files.items():
+                        form_data.add_field(
+                            key,
+                            file_info['content'],
+                            filename=file_info['filename'],
+                            content_type=file_info.get('content_type', 'application/octet-stream')
+                        )
+
+                # إضافة البيانات إذا كانت موجودة
+                if data:
+                    for key, value in data.items():
+                        if value is not None:
+                            form_data.add_field(key, str(value))
+
+                # زيادة المهلة لخدمة تحليل النشاط
+                timeout = aiohttp.ClientTimeout(total=service_config['timeout'])
+
+                async with session.post(
+                        f"{service_config['url']}/{endpoint}",
+                        data=form_data,
+                        timeout=timeout
+                ) as response:
+                    if response.status == 200:
+                        return await response.json()
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"❌ Service {service_name} returned status {response.status}: {error_text}")
+
+                        # إعادة المحاولة للأخطاء 5xx
+                        if response.status >= 500 and attempt < max_retries - 1:
+                            logger.info(f"🔄 إعادة المحاولة {attempt + 1} لخدمة {service_name}...")
+                            await asyncio.sleep(retry_delay)
+                            continue
+                        return None
+
+        except asyncio.TimeoutError:
+            logger.error(f"❌ Timeout calling {service_name} service (المحاولة {attempt + 1})")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(retry_delay)
+                continue
+            return None
+        except Exception as e:
+            logger.error(f"❌ Error calling {service_name} service (المحاولة {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(retry_delay)
+                continue
+            return None
+
+    return None
+
+def convert_serializable_types(obj: Any) -> Any:
+    """
+    تحويل أنواع البيانات غير القياسية (NumPy, PyTorch) إلى أنواع JSON-serializable.
+    تدعم القواميس والقوائم المتداخلة بشكل recursive.
+    """
+    if obj is None:
+        return None
+
+    if isinstance(obj, dict):
+        return {key: convert_serializable_types(value) for key, value in obj.items()}
+
+    if isinstance(obj, list):
+        return [convert_serializable_types(item) for item in obj]
+
+    # التعامل مع PyTorch Tensors (السبب الرئيسي في التتبع)
+    if isinstance(obj, torch.Tensor):
+        if obj.numel() == 1:  # scalar tensor (مثل confidence)
+            return float(obj.item())
+        else:  # array tensor (مثل bbox)
+            # نقل إلى CPU إذا كان على GPU، ثم تحويل إلى list
+            return obj.cpu().tolist()
+
+    # التعامل مع NumPy types
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+
+    # أنواع أخرى قياسية (لا نحتاج تحويل)
+    return obj
+
+
+def convert_video_to_web_format(input_path: str, output_path: str) -> bool:
+    """تحويل الفيديو إلى تنسيق متوافق مع الويب"""
     try:
-        async with aiohttp.ClientSession() as session:
-            form_data = aiohttp.FormData()
+        if not Path(input_path).exists():
+            print(f"❌ ملف الفيديو الأصلي غير موجود: {input_path}")
+            return False
 
-            # إضافة الملفات إذا كانت موجودة
-            if files:
-                for key, file_info in files.items():
-                    form_data.add_field(key, file_info['content'], filename=file_info['filename'])
+        # استخدام إعدادات متوافقة مع جميع المتصفحات
+        command = [
+            'ffmpeg', '-i', input_path,
+            '-c:v', 'libx264',
+            '-preset', 'medium',
+            '-crf', '23',
+            '-profile:v', 'baseline',  # لضمان التوافق
+            '-level', '3.0',
+            '-pix_fmt', 'yuv420p',
+            '-c:a', 'aac',
+            '-b:a', '128k',
+            '-movflags', '+faststart',  # للتحميل التدريجي
+            '-y',
+            '-loglevel', 'error',
+            output_path
+        ]
 
-            # إضافة البيانات إذا كانت موجودة
-            if data:
-                for key, value in data.items():
-                    form_data.add_field(key, str(value))
+        result = subprocess.run(command, capture_output=True, text=True, timeout=300)
 
-            async with session.post(
-                    f"{service_config['url']}/{endpoint}",
-                    data=form_data,
-                    timeout=service_config['timeout']
-            ) as response:
-                if response.status == 200:
-                    return await response.json()
-                else:
-                    logger.error(f"Service {service_name} returned status {response.status}")
-                    return None
-
-    except asyncio.TimeoutError:
-        logger.error(f"Timeout calling {service_name} service")
-        return None
+        if result.returncode == 0:
+            print(f"✅ تم تحويل الفيديو بنجاح: {output_path}")
+            return True
+        else:
+            print(f"❌ فشل تحويل الفيديو: {result.stderr}")
+            return False
+    except subprocess.TimeoutExpired:
+        print(f"❌ انتهت مهلة تحويل الفيديو")
+        return False
     except Exception as e:
-        logger.error(f"Error calling {service_name} service: {e}")
-        return None
+        print(f"❌ خطأ في تحويل الفيديو: {e}")
+        return False
 
 async def process_video(input_path: str, process_id: str, options: dict):
     """الدالة الرئيسية لمعالجة الفيديو - محدثة للخدمات"""
@@ -3268,9 +3420,17 @@ async def process_video(input_path: str, process_id: str, options: dict):
 
         for directory in [process_dir, faces_dir, video_dir, audio_dir]:
             directory.mkdir(exist_ok=True, parents=True)
+        # في دالة process_video، أضف هذه السجلات
+        logger.info(f"🎬 بدء معالجة الفيديو: {process_id}")
+        logger.info(f"⚙️ خيارات المعالجة: {options}")
+
+        # في نهاية process_video
 
         db.update_process_status(process_id, "processing", 5, "جاري فتح الفيديو")
 
+        await asyncio.sleep(0.1)
+
+        start_time = time.time()
         # الحصول على معلومات الفيديو الأساسية
         video_info = await get_video_info(input_path)
         if not video_info:
@@ -3299,16 +3459,52 @@ async def process_video(input_path: str, process_id: str, options: dict):
             await process_activity_service(input_path, process_id, options, all_results)
 
         # 4. حفظ النتائج النهائية
+        final_video_path = await ensure_video_output(process_id, input_path)
+        if final_video_path:
+            all_results["analyzed_video_path"] = str(Path(final_video_path).relative_to(OUTPUTS_DIR / process_id))
+
+        # حفظ النتائج النهائية
+        await save_final_results(process_id, all_results)
         await save_final_results(process_id, all_results)
 
         db.update_process_status(process_id, "completed", 100, "تمت المعالجة بنجاح")
         logger.info(f"🎉 تمت معالجة الفيديو بنجاح! العملية: {process_id}")
+        logger.info(f"✅ انتهت معالجة الفيديو: {process_id}")
+        logger.info(f"📊 النتائج المجمعة: {all_results.keys()}")
+        end_time = time.time()
+        processing_duration = end_time - start_time
+        all_results["processing_duration_seconds"] = str(processing_duration)
+
 
     except Exception as e:
         error_msg = f"خطأ في المعالجة: {str(e)}"
         logger.error(f"❌ {error_msg}")
         db.update_process_status(process_id, "error", 0, error_msg)
 
+
+async def ensure_video_output(process_id: str, input_path: str):
+    """التأكد من وجود فيديو مخرج، وإنشاء نسخة من الفيديو الأصلي إذا لزم الأمر"""
+    try:
+        video_dir = OUTPUTS_DIR / process_id / "video"
+        web_video_path = video_dir / "analyzed_video_web.mp4"
+
+        # إذا كان الفيديو المحول موجوداً، استخدمه
+        if web_video_path.exists():
+            return str(web_video_path)
+
+        # إذا لم يكن موجوداً، أنشئ نسخة من الفيديو الأصلي
+        if convert_video_to_web_format(input_path, str(web_video_path)):
+            return str(web_video_path)
+        else:
+            # إذا فشل التحويل، انسخ الفيديو الأصلي
+            original_copy = video_dir / "original_video.mp4"
+            import shutil
+            shutil.copy2(input_path, original_copy)
+            return str(original_copy)
+
+    except Exception as e:
+        logger.error(f"❌ خطأ في إنشاء فيديو المخرجات: {e}")
+        return None
 
 async def process_audio_service(input_path: str, process_id: str, options: dict, all_results: dict):
     """معالجة الصوت عبر الخدمة المخصصة"""
@@ -3323,6 +3519,7 @@ async def process_audio_service(input_path: str, process_id: str, options: dict,
                 }
             }
             response = await call_service("audio", "transcribe", files=files)
+            print(response)
 
             if response:
                 all_results["transcription"] = response
@@ -3344,6 +3541,7 @@ async def process_audio_service(input_path: str, process_id: str, options: dict,
 
 async def process_video_services(input_path: str, process_id: str, options: dict, all_results: dict):
     """معالجة إطارات الفيديو عبر الخدمات المخصصة"""
+    video_dir = OUTPUTS_DIR / process_id / "video"
     try:
         db.update_process_status(process_id, "processing", 20, "جاري معالجة إطارات الفيديو")
 
@@ -3352,7 +3550,7 @@ async def process_video_services(input_path: str, process_id: str, options: dict
             return
 
         # إعداد فيديو الإخراج
-        output_video_path = OUTPUTS_DIR / process_id / "video" / "processed_video.mp4"
+        output_video_path = OUTPUTS_DIR / process_id / "video" / "analyzed_video.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(str(output_video_path), fourcc, all_results["fps"],
                               (all_results["width"], all_results["height"]))
@@ -3362,6 +3560,9 @@ async def process_video_services(input_path: str, process_id: str, options: dict
         all_texts = []
         all_objects = []
         all_tracks = []
+
+        # إضافة متغير لتتبع المسارات
+        trajectory_history = {}
 
         detection_step = options.get("detection_step", 1)
 
@@ -3405,6 +3606,11 @@ async def process_video_services(input_path: str, process_id: str, options: dict
                             all_tracks.extend(result.get("tracks", []))
                             processed_frame = draw_objects_on_frame(processed_frame, result)
 
+                            # رسم المسارات
+                            processed_frame, trajectory_history = draw_trajectories_on_frame(
+                                processed_frame, result.get("tracks", []), trajectory_history
+                            )
+
             out.write(processed_frame)
             frame_number += 1
 
@@ -3415,8 +3621,20 @@ async def process_video_services(input_path: str, process_id: str, options: dict
                 db.update_process_status(process_id, "processing", progress,
                                          f"جاري معالجة الإطار {frame_number}/{all_results['total_frames']}")
 
-        cap.release()
         out.release()
+        cap.release()
+
+        # استخدام الفيديو المحول فقط
+        web_video_path = str(video_dir / "analyzed_video_web.mp4")
+        if convert_video_to_web_format(output_video_path, web_video_path):
+            # حذف الفيديو الأصلي والاحتفاظ بالمحول فقط
+            if os.path.exists(output_video_path):
+                os.remove(output_video_path)
+            final_video_path = web_video_path
+            print("✅ تم تحويل الفيديو إلى تنسيق ويب متوافق")
+        else:
+            final_video_path = output_video_path
+            print("⚠️ فشل تحويل الفيديو، سيتم استخدام الفيديو الأصلي")
 
         # حفظ نتائج الكشف
         await save_detection_results(process_id, all_faces, all_texts, all_objects, all_tracks)
@@ -3427,7 +3645,7 @@ async def process_video_services(input_path: str, process_id: str, options: dict
             "texts_detected": len(all_texts),
             "objects_detected": len(all_objects),
             "tracks_detected": len(set(track["track_id"] for track in all_tracks if track.get("track_id"))),
-            "processed_video_path": str(output_video_path.relative_to(OUTPUTS_DIR))
+            "video_filename": f"{process_id}/video/analyzed_video_web.mp4"
         })
 
     except Exception as e:
@@ -3451,19 +3669,28 @@ async def process_frame_faces(frame: np.ndarray, frame_number: int, process_id: 
 
         response = await call_service("faces", "detect", files=files, data=data)
 
-        if response:
+        if response and 'faces' in response:
             faces = response.get('faces', [])
+            logger.info(f"✅ تم كشف {len(faces)} وجوه في الإطار {frame_number}")
 
+            processed_faces = []
             for face in faces:
-                face['frame_number'] = frame_number
-                await save_face_image(frame, face, frame_number, process_id)
+                if isinstance(face, dict) and 'bbox' in face:
+                    face['frame_number'] = frame_number
+                    # حفظ صورة الوجه
+                    await save_face_image(frame, face, frame_number, process_id)
+                    processed_faces.append(face)
+                else:
+                    logger.warning(f"⚠️ تنسيق بيانات الوجه غير صالح: {face}")
 
-            return {"faces": faces}
+            return {"faces": processed_faces}
+        else:
+            logger.warning(f"⚠️ لم يتم العثور على وجوه في الإطار {frame_number} أو استجابة غير صالحة")
+            return {"faces": []}
 
     except Exception as e:
         logger.error(f"❌ خطأ في كشف الوجوه للإطار {frame_number}: {e}")
-
-    return {"faces": []}
+        return {"faces": []}
 
 
 async def process_frame_texts(frame: np.ndarray, frame_number: int, options: dict):
@@ -3516,20 +3743,32 @@ async def process_frame_objects(frame: np.ndarray, frame_number: int, options: d
             objects_data = response.get('objects', [])
             tracks_data = response.get('tracks', [])
 
+            # التأكد من أن البيانات في التنسيق الصحيح
+            processed_objects = []
             for obj in objects_data:
-                obj['frame_number'] = frame_number
+                if isinstance(obj, dict):
+                    obj['frame_number'] = frame_number
+                    # تحويل numpy types إلى Python types
+                    if 'confidence' in obj and hasattr(obj['confidence'], 'item'):
+                        obj['confidence'] = obj['confidence'].item()
+                    processed_objects.append(obj)
+
+            processed_tracks = []
             for track in tracks_data:
-                track['frame_number'] = frame_number
+                if isinstance(track, dict):
+                    track['frame_number'] = frame_number
+                    processed_tracks.append(track)
 
             return {
-                "objects": objects_data,
-                "tracks": tracks_data
+                "objects": processed_objects,
+                "tracks": processed_tracks
             }
+        else:
+            return {"objects": [], "tracks": []}
 
     except Exception as e:
         logger.error(f"❌ خطأ في كشف الكائنات للإطار {frame_number}: {e}")
-
-    return {"objects": [], "tracks": []}
+        return {"objects": [], "tracks": []}
 
 
 async def process_activity_service(input_path: str, process_id: str, options: dict, all_results: dict):
@@ -3580,17 +3819,25 @@ async def process_activity_service(input_path: str, process_id: str, options: di
 async def save_face_image(frame: np.ndarray, face: dict, frame_number: int, process_id: str):
     """حفظ صورة الوجه المقتطع"""
     try:
-        bbox = face.get('bbox', {})
-        if not bbox:
+        bbox = face.get('bbox', [])
+        if not bbox or len(bbox) < 4:
+            logger.error(f"❌ إحداثيات الوجه غير صالحة: {bbox}")
             return
 
         FACE_PADDING_RATIO = 0.2
 
-        # استخراج الإحداثيات
-        x1 = bbox.get('x1', 0)
-        y1 = bbox.get('y1', 0)
-        x2 = bbox.get('x2', 0)
-        y2 = bbox.get('y2', 0)
+        if len(bbox) == 4:
+
+            x1 = max(int(bbox[0]), 0)
+            y1 = max(int(bbox[1]), 0)
+            width_face = max(int(bbox[2]), 0)
+            height_face = max(int(bbox[3]), 0)
+
+            x2 = x1 + width_face
+            y2 = y1 + height_face
+        else:
+            logger.error(f"❌ تنسيق إحداثيات الوجه غير متوقع: {bbox}")
+            return
 
         # التأكد من أن الإحداثيات ضمن حدود الإطار
         h, w = frame.shape[:2]
@@ -3599,28 +3846,36 @@ async def save_face_image(frame: np.ndarray, face: dict, frame_number: int, proc
         x2 = max(x1, min(x2, w))
         y2 = max(y1, min(y2, h))
 
-        w1 = x2 - x1
-        h1 = y2 - y1
-        pad_x = int(w1 * FACE_PADDING_RATIO / 2)
-        pad_y = int(h1 * FACE_PADDING_RATIO / 2)
+        # إضافة هامش حول الوجه
+        pad_x = int(width_face * FACE_PADDING_RATIO / 2)
+        pad_y = int(height_face * FACE_PADDING_RATIO / 2)
 
         x1_padded = max(0, x1 - pad_x)
         y1_padded = max(0, y1 - pad_y)
-        x2_padded = min(frame.shape[1], x1 + w1 + pad_x)
-        y2_padded = min(frame.shape[0], y1 + h1 + pad_y)
+        x2_padded = min(frame.shape[1], x2 + pad_x)
+        y2_padded = min(frame.shape[0], y2 + pad_y)
 
+        # قص صورة الوجه
         face_img = frame[y1_padded:y2_padded, x1_padded:x2_padded]
+        TARGET_FACE_WIDTH = 228
+        TARGET_FACE_HEIGHT = 228
+        if face_img.shape[0] > 0 and face_img.shape[1] > 0:
+            current_height, current_width = face_img.shape[:2]
+            if current_width < TARGET_FACE_WIDTH or current_height < TARGET_FACE_HEIGHT:
+                face_img = cv2.resize(face_img, (
+                    max(current_width * 2, TARGET_FACE_WIDTH), max(current_height * 2, TARGET_FACE_HEIGHT)),
+                                      interpolation=cv2.INTER_CUBIC)
+            face_img_resized = cv2.resize(face_img, (TARGET_FACE_WIDTH, TARGET_FACE_HEIGHT),
+                                          interpolation=cv2.INTER_AREA)
 
-        if face_img.size > 0:
-            # حفظ صورة الوجه
             face_filename = f"face_{frame_number}_{face.get('face_id', 0)}.jpg"
             face_path = OUTPUTS_DIR / process_id / "faces" / face_filename
-
-            cv2.imwrite(str(face_path), face_img)
-            face['image_path'] = str(face_path.relative_to(OUTPUTS_DIR))
-
+            cv2.imwrite(str(face_path), face_img_resized)
+            face["image_path"] = face_filename
+            logger.info(f"✅ تم حفظ صورة الوجه: {face_filename}")
     except Exception as e:
-        print(f"❌ خطأ في حفظ صورة الوجه: {e}")
+        logger.error(f"❌ خطأ في حفظ صورة الوجه: {e}")
+        logger.error(f"❌ تفاصيل الوجه: {face}")
 
 
 async def get_video_info(video_path: str) -> dict:
@@ -3676,55 +3931,161 @@ async def save_detection_results(process_id: str, faces: list, texts: list, obje
             }
             detection_file = process_dir / "detection_data.json"
             with open(detection_file, 'w', encoding='utf-8') as f:
-                json.dump(detection_data, f, ensure_ascii=False, indent=2)
+                json.dump(convert_serializable_types(detection_data), f, ensure_ascii=False, indent=2)
 
     except Exception as e:
         logger.error(f"❌ خطأ في حفظ نتائج الكشف: {e}")
+
+
+def generate_color_from_id(track_id, saturation=0.8, value=0.8):
+    """توليد لون فريد بناءً على track_id باستخدام HSV"""
+    import math
+
+    # استخدام الزاوية في دائرة الألوان بناءً على track_id
+    hue = (track_id * 137.5) % 360  # زاوية ذهبية لتوزيع الألوان
+    hue = hue / 360.0  # تحويل إلى نطاق [0, 1]
+
+    # تحويل HSV إلى RGB
+    h = hue
+    s = saturation
+    v = value
+
+    i = math.floor(h * 6)
+    f = h * 6 - i
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+
+    if i % 6 == 0:
+        r, g, b = v, t, p
+    elif i % 6 == 1:
+        r, g, b = q, v, p
+    elif i % 6 == 2:
+        r, g, b = p, v, t
+    elif i % 6 == 3:
+        r, g, b = p, q, v
+    elif i % 6 == 4:
+        r, g, b = t, p, v
+    else:
+        r, g, b = v, p, q
+
+    # تحويل إلى BGR لـ OpenCV
+    return (int(b * 255), int(g * 255), int(r * 255))
+
+
+def get_color_for_track(track_id, color_cache={}):
+    """الحصول على لون ثابت لكل track_id مع التخزين المؤقت"""
+    if track_id not in color_cache:
+        color_cache[track_id] = generate_color_from_id(track_id)
+    return color_cache[track_id]
+
+
+def get_color_for_class(class_name, color_cache={}):
+    """الحصول على لون ثابت لكل فئة كائن مع التخزين المؤقت"""
+    if class_name not in color_cache:
+        # ألوان محددة مسبقاً للفئات الشائعة
+        class_colors = {
+            "person": (255, 0, 0),  # أحمر
+            "car": (0, 255, 0),  # أخضر
+            "bicycle": (0, 255, 255),  # أصفر
+            "motorcycle": (255, 255, 0),  # سماوي
+            "bus": (255, 0, 255),  # وردي
+            "truck": (0, 0, 255),  # أزرق
+            "cat": (128, 0, 128),  # بنفسجي
+            "dog": (128, 128, 0),  # زيتوني
+            "chair": (0, 128, 128),  # تركواز
+            "book": (128, 128, 128),  # رمادي
+        }
+        color_cache[class_name] = class_colors.get(class_name, generate_color_from_id(hash(class_name) % 1000))
+
+    return color_cache[class_name]
+
+
 
 async def save_final_results(process_id: str, all_results: dict):
     """حفظ النتائج النهائية"""
     try:
         results_file = OUTPUTS_DIR / process_id / "final_results.json"
-        with open(results_file, 'w', encoding='utf-8') as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
-        print(f"✅ تم حفظ النتائج النهائية في {results_file}")
+
+        # ✅ إنشاء نسخة نظيفة من النتائج
+        final_results = {
+            "process_id": process_id,
+            "processing_date": all_results.get("processing_date"),
+            "processing_options": all_results.get("processing_options"),
+            "total_frames": all_results.get("total_frames"),
+            "fps": all_results.get("fps"),
+            "width": all_results.get("width"),
+            "height": all_results.get("height"),
+            "duration_seconds": all_results.get("duration_seconds"),
+            "resolution": all_results.get("resolution"),
+            "frames_processed": all_results.get("frames_processed"),
+            "faces_detected": all_results.get("faces_detected"),
+            "texts_detected": all_results.get("texts_detected"),
+            "objects_detected": all_results.get("objects_detected"),
+            "tracks_detected": all_results.get("tracks_detected"),
+            "processing_duration_seconds": all_results.get("processing_duration_seconds"),
+            "transcription": all_results.get("transcription"),
+            "activity_analysis": all_results.get("activity_analysis"),
+            "video_filename":all_results.get("activity_analysis")
+        }
+
+        # ✅ استخدام aiofiles للحفظ
+        async with aiofiles.open(results_file, 'w', encoding='utf-8') as f:
+            await f.write(json.dumps(final_results, ensure_ascii=False, indent=2))
+
+        logger.info(f"✅ تم حفظ النتائج النهائية في {results_file}")
     except Exception as e:
-        print(f"❌ خطأ في حفظ النتائج النهائية: {e}")
+        logger.error(f"❌ خطأ في حفظ النتائج النهائية: {e}")
 
 
 def draw_faces_on_frame(frame: np.ndarray, faces: list):
-    """رسم الوجوه المكتشفة على الإطار"""
-    for face in faces:
+    """رسم الوجوه المكتشفة على الإطار مع ألوان مختلفة"""
+    for i, face in enumerate(faces):
         bbox = face.get('bbox', [])
-        if len(bbox) == 4:  # [x1, y1, x2, y2]
-            x1, y1, x2, y2 = map(int, bbox)
+        if len(bbox) == 4:  # [x1, y1, width, height]
+            x1, y1, width_face, height_face = map(int, bbox)
+            x2 = x1 + width_face
+            y2 = y1 + height_face
             confidence = face.get('confidence', 0)
 
-            # رسم مربع الوجه
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # توليد لون فريد لكل وجه بناءً على الفهرس
+            face_color = generate_color_from_id(i, saturation=0.9, value=0.9)
 
-            # إضافة نص الثقة
+            # رسم مربع الوجه
+            cv2.rectangle(frame, (x1, y1), (x2, y2), face_color, 2)
+
+            # إضافة نص الثقة مع خلفية
             label = f"Face {confidence:.2f}"
-            cv2.putText(frame, label, (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+            cv2.rectangle(frame, (x1, y1 - label_size[1] - 10),
+                          (x1 + label_size[0], y1), face_color, -1)
+            cv2.putText(frame, label, (x1, y1 - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     return frame
 
 
 def draw_texts_on_frame(frame: np.ndarray, texts: list):
-    """رسم النصوص المكتشفة على الإطار"""
-    for text in texts:
+    """رسم النصوص المكتشفة على الإطار مع ألوان مختلفة"""
+    for i, text in enumerate(texts):
         bbox = text.get('bbox', [])
         if len(bbox) == 4:  # [x, y, width, height]
             x, y, w, h = bbox
             text_content = text.get('text', '')
 
-            # رسم مربع النص
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+            # توليد لون فريد لكل نص
+            text_color = generate_color_from_id(i + 1000, saturation=0.7, value=0.9)
 
-            # إضافة النص
-            cv2.putText(frame, text_content, (x, y - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+            # رسم مربع النص
+            cv2.rectangle(frame, (x, y), (x + w, y + h), text_color, 2)
+
+            # إضافة النص مع خلفية
+            label = f"Text: {text_content[:20]}{'...' if len(text_content) > 20 else ''}"
+            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+            cv2.rectangle(frame, (x, y - label_size[1] - 10),
+                          (x + label_size[0], y), text_color, -1)
+            cv2.putText(frame, label, (x, y - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     return frame
 
@@ -3737,8 +4098,14 @@ def draw_objects_on_frame(frame: np.ndarray, objects_data: dict):
     # رسم الكائنات
     for obj in objects:
         bbox = obj.get('bbox', [])
-        if len(bbox) == 4:  # [x1, y1, x2, y2]
-            x1, y1, x2, y2 = map(int, bbox)
+        if len(bbox) >= 4:  # دعم تنسيقات مختلفة [x1, y1, x2, y2] أو [x1, y1, width, height]
+            if len(bbox) == 4:
+                # إذا كان الطول 4، نفترض [x1, y1, x2, y2]
+                x1, y1, x2, y2 = map(int, bbox)
+            else:
+                # إذا كان الطول مختلف، نأخذ أول 4 عناصر
+                x1, y1, x2, y2 = map(int, bbox[:4])
+
             class_name = obj.get('class_name', 'object')
             confidence = obj.get('confidence', 0)
 
@@ -3750,23 +4117,68 @@ def draw_objects_on_frame(frame: np.ndarray, objects_data: dict):
             cv2.putText(frame, label, (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-    # رسم المسارات (الأشخاص)
-    for track in tracks:
-        bbox = track.get('bbox', [])
-        if len(bbox) == 4:
-            x1, y1, x2, y2 = map(int, bbox)
-            track_id = track.get('track_id', '')
-
-            # رسم مربع التتبع بلون مختلف
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 255, 0), 2)
-
-            # إضافة معرف المسار
-            label = f"Person {track_id}"
-            cv2.putText(frame, label, (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
-
     return frame
 
+
+def draw_trajectories_on_frame(frame: np.ndarray, tracks: list, trajectory_history: dict):
+    """رسم مسارات تحرك الأشخاص على الإطار مع ألوان مختلفة"""
+    try:
+        for track in tracks:
+            track_id = track.get('track_id')
+            if track_id is None:
+                continue
+
+            bbox = track.get('bbox', [])
+            if len(bbox) >= 4:
+                if len(bbox) == 4:
+                    x1, y1, x2, y2 = map(int, bbox)
+                else:
+                    x1, y1, x2, y2 = map(int, bbox[:4])
+
+                # الحصول على لون فريد للمسار
+                track_color = get_color_for_track(track_id)
+
+                # حساب مركز المربع
+                center_x = (x1 + x2) // 2
+                center_y = (y1 + y2) // 2
+
+                # إضافة النقطة إلى تاريخ المسار
+                if track_id not in trajectory_history:
+                    trajectory_history[track_id] = []
+
+                trajectory_history[track_id].append((center_x, center_y))
+
+                # الاحتفاظ بآخر 30 نقطة فقط للمسار (زيادة للرسم الأفضل)
+                if len(trajectory_history[track_id]) > 30:
+                    trajectory_history[track_id].pop(0)
+
+                # رسم المسار بخط متدرج الشفافية
+                points = trajectory_history[track_id]
+                for i in range(1, len(points)):
+                    # زيادة الشفافية تدريجياً للنقاط القديمة
+                    alpha = i / len(points)
+                    thickness = max(1, int(3 * alpha))
+                    cv2.line(frame, points[i - 1], points[i], track_color, thickness)
+
+                # رسم نقطة المركز الحالية
+                cv2.circle(frame, (center_x, center_y), 4, track_color, -1)
+                cv2.circle(frame, (center_x, center_y), 6, (255, 255, 255), 1)  # حد أبيض
+
+                # رسم مربع التتبع باللون المطابق للمسار
+                cv2.rectangle(frame, (x1, y1), (x2, y2), track_color, 2)
+
+                # إضافة معرف المسار مع خلفية
+                label = f"ID:{track_id}"
+                label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+                cv2.rectangle(frame, (x1, y1 - label_size[1] - 10),
+                              (x1 + label_size[0], y1), track_color, -1)
+                cv2.putText(frame, label, (x1, y1 - 5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+        return frame, trajectory_history
+    except Exception as e:
+        logger.error(f"❌ خطأ في رسم المسارات: {e}")
+        return frame, trajectory_history
 
 async def extract_audio_from_video(video_path: str, output_audio_path: str) -> bool:
     """استخراج الصوت من الفيديو باستخدام ffmpeg"""
@@ -3781,10 +4193,8 @@ async def extract_audio_from_video(video_path: str, output_audio_path: str) -> b
         print(f"❌ خطأ في استخراج الصوت: {e}")
         return False
 
-
-# الدوال المتبقية من processing_pipeline.py الأصلي للحفاظ على التوافق
 async def get_processing_status(process_id: str):
-    """الحصول على حالة المعالجة (للتوافق مع الكود القديم)"""
+    """الحصول على حالة المعالجة"""
     try:
         process_info = db.get_process_status(process_id)
         if not process_info:
@@ -3795,8 +4205,14 @@ async def get_processing_status(process_id: str):
 
         results = {}
         if results_file.exists():
-            with open(results_file, 'r', encoding='utf-8') as f:
-                results = json.load(f)
+            try:
+                # ✅ استخدام aiofiles للقراءة غير المتزامنة
+                async with aiofiles.open(results_file, 'r', encoding='utf-8') as f:
+                    content = await f.read()
+                    results = json.loads(content)
+            except Exception as e:
+                logger.error(f"❌ خطأ في قراءة final_results.json: {e}")
+                results = {}
 
         results["status"] = process_info["status"]
         results["message"] = process_info["message"]
@@ -3805,7 +4221,7 @@ async def get_processing_status(process_id: str):
         return results, process_info["status"], process_info["message"]
 
     except Exception as e:
-        print(f"❌ خطأ في الحصول على حالة المعالجة: {e}")
+        logger.error(f"❌ خطأ في الحصول على حالة المعالجة: {e}")
         return {}, "error", f"خطأ في الحصول على الحالة: {str(e)}"
 
 
@@ -3986,7 +4402,7 @@ def get_enhancement_name(enhancement_type: str) -> str:
 async def stop_analysis_endpoint(process_id: str):
     """إيقاف معالجة الفيديو"""
     try:
-        success = stop_video_processing(process_id)
+        success = await stop_video_processing()
 
         if success:
             # تحديث حالة العملية في قاعدة البيانات
@@ -4143,7 +4559,7 @@ async def save_enhanced_face_endpoint(data: dict):
 async def get_results(process_id: str):
     """الحصول على نتائج المعالجة"""
     try:
-        results, status, message = get_processing_status(process_id)
+        results, status, message = await get_processing_status(process_id)
 
         if status == "not_found":
             raise HTTPException(status_code=404, detail="لم يتم العثور على العملية")
@@ -4152,39 +4568,63 @@ async def get_results(process_id: str):
         if status in ["completed", "stopped"]:
             process_dir = OUTPUTS_DIR / process_id
 
-            # تحميل النتائج النهائية من JSON
+            # تحميل النتائج النهائية من JSON - مع معالجة أفضل
             results_file = process_dir / "final_results.json"
             if results_file.exists():
-                async with aiofiles.open(results_file, 'r', encoding='utf-8') as f:
-                    file_results = json.loads(await f.read())
-                results.update(file_results)
+                try:
+                    async with aiofiles.open(results_file, 'r', encoding='utf-8') as f:
+                        file_results = json.loads(await f.read())
+
+                    # ✅ دمج النتائج بشكل انتقائي
+                    for key, value in file_results.items():
+                        if key not in ["status", "message", "progress"]:
+                            results[key] = value
+                except Exception as e:
+                    logger.error(f"❌ خطأ في تحميل final_results.json: {e}")
+                    results["final_results_error"] = str(e)
 
             # تحميل بيانات الوجوه إذا كانت موجودة
             faces_file = process_dir / "faces_data.json"
             if faces_file.exists():
-                async with aiofiles.open(faces_file, 'r', encoding='utf-8') as f:
-                    results["faces_data"] = json.loads(await f.read())
+                try:
+                    async with aiofiles.open(faces_file, 'r', encoding='utf-8') as f:
+                        results["faces_data"] = json.loads(await f.read())
+                except Exception as e:
+                    logger.error(f"❌ خطأ في تحميل faces_data.json: {e}")
+                    results["faces_data"] = []
 
             # تحميل بيانات النصوص إذا كانت موجودة
             texts_file = process_dir / "texts_data.json"
             if texts_file.exists():
-                async with aiofiles.open(texts_file, 'r', encoding='utf-8') as f:
-                    results["extracted_texts"] = json.loads(await f.read())
+                try:
+                    async with aiofiles.open(texts_file, 'r', encoding='utf-8') as f:
+                        results["extracted_texts"] = json.loads(await f.read())
+                except Exception as e:
+                    logger.error(f"❌ خطأ في تحميل texts_data.json: {e}")
+                    results["extracted_texts"] = []
 
             # تحميل بيانات التتبع إذا كانت موجودة
             tracking_file = process_dir / "tracking_data.json"
             if tracking_file.exists():
-                async with aiofiles.open(tracking_file, 'r', encoding='utf-8') as f:
-                    results["tracking_data"] = json.loads(await f.read())
+                try:
+                    async with aiofiles.open(tracking_file, 'r', encoding='utf-8') as f:
+                        results["tracking_data"] = json.loads(await f.read())
+                except Exception as e:
+                    logger.error(f"❌ خطأ في تحميل tracking_data.json: {e}")
+                    results["tracking_data"] = []
 
-            # تحميل بيانات النشاط إذا كانت موجودة
+            # ✅ تحميل بيانات النشاط بشكل صحيح
             activity_file = process_dir / "activity_analysis.json"
             if activity_file.exists():
-                async with aiofiles.open(activity_file, 'r', encoding='utf-8') as f:
-                    activity_data_from_file = json.loads(await f.read())
-                    results["activity_analysis_full"] = activity_data_from_file  # اسم جديد لتجنب التضارب
+                try:
+                    async with aiofiles.open(activity_file, 'r', encoding='utf-8') as f:
+                        activity_data = json.loads(await f.read())
+                    results["activity_analysis"] = activity_data  # ✅ استخدام نفس المفتاح
+                except Exception as e:
+                    logger.error(f"❌ خطأ في تحميل activity_analysis.json: {e}")
+                    results["activity_analysis"] = {"error": str(e)}
             else:
-                results["activity_analysis_full"] = {}
+                results["activity_analysis"] = {}  # ✅ قيمة افتراضية متسقة
 
         return JSONResponse({
             "process_id": process_id,
@@ -4195,6 +4635,7 @@ async def get_results(process_id: str):
         })
 
     except Exception as e:
+        logger.error(f"❌ خطأ في الحصول على النتائج: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"خطأ في الحصول على النتائج: {str(e)}")
 
 
@@ -4346,7 +4787,7 @@ if __name__ == "__main__":
     import uvicorn
 
     print("🌐 جاري تشغيل خادم FastAPI...")
-    print(f"📊 يمكنك الوصول إلى التطبيق على: http://{APP_CONFIG['host']}:{APP_CONFIG['port']}")
+    print(f"📊 يمكنك الوصول إلى التطبيق على: http://{APP_CONFIG['host']}:{APP_CONFIG['port']}/docs")
     print("⏹️  اضغط Ctrl+C لإيقاف الخادم")
 
     uvicorn.run(
