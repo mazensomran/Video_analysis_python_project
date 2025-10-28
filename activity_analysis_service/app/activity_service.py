@@ -1,17 +1,33 @@
+import logging
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
-from fastapi.responses import JSONResponse
-import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 import tempfile
 import os
 
+from activity_model import ActivityRecognizer
 
-from activity_model import ActivityRecognizer, MarianTranslator
+def setup_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="خدمة تحليل النشاط والبيئة")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # تحميل النماذج
 activity_recognizer = ActivityRecognizer()
-translator = MarianTranslator()
 
 
 @app.post("/analyze")
@@ -51,14 +67,35 @@ async def analyze_activity(
             enhancement_strength=enhancement_strength
         )
 
-        activity_analysis_ar = translator.translate(activity_analysis_en)
 
         os.unlink(temp_path)
 
         return {
             "activity_analysis_en": activity_analysis_en,
-            "activity_analysis_ar": activity_analysis_ar
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"خطأ في المعالجة: {str(e)}")
+
+    finally:
+        # تنظيف الملف المؤقت في جميع الحالات
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception as e:
+                logger.warning(f"⚠️ فشل في تنظيف الملف المؤقت: {e}")
+
+@app.get("/health")
+async def health_check():
+    """فحص صحة الخدمة"""
+    status = "healthy" if activity_recognizer and activity_recognizer.qwen2_vl_model else "unhealthy"
+    return {
+        "status": status,
+        "service": "activity-analysis",
+        "model_loaded": activity_recognizer is not None and activity_recognizer.qwen2_vl_model is not None
+    }
+
+
+@app.get("/")
+async def root():
+    return {"message": "خدمة تحليل النشاط والبيئة تعمل"}
 
