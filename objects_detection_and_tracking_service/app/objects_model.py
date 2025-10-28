@@ -56,14 +56,15 @@ class ObjectTracker:
             logger.error(f"❌ خطأ في تهيئة مكونات supervision: {e}")
             raise Exception(f"فشل في تهيئة ObjectTracker: {e}")
 
-    def track_objects(self, frame: np.ndarray,threshold: float):
+    def track_objects(self, frame: np.ndarray, threshold: float):
         """يكشف ويتتبع جميع الكائنات"""
         all_detections = []
+        current_threshold = threshold if threshold is not None else self.detection_threshold
 
         try:
             if self.model is None or self.image_processor is None:
                 logger.error("❌ النموذج غير مُحمل.")
-                return sv.Detections.empty(), []
+                return []  # إرجاع قائمة فارغة بدلاً من sv.Detections.empty()
 
             h, w, _ = frame.shape
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -77,11 +78,11 @@ class ObjectTracker:
             processed_results = self.image_processor.post_process_object_detection(
                 outputs,
                 target_sizes=torch.tensor([(h, w)], device=self.device),
-                threshold=self.detection_threshold
+                threshold=current_threshold
             )[0]
 
             if 'boxes' not in processed_results or len(processed_results['boxes']) == 0:
-                return sv.Detections.empty(), []
+                return []  # إرجاع قائمة فارغة
 
             detections = sv.Detections.from_transformers(
                 transformers_results=processed_results,
@@ -93,7 +94,7 @@ class ObjectTracker:
                 detections = detections[mask]
 
             if len(detections) == 0:
-                return sv.Detections.empty(), []
+                return []  # إرجاع قائمة فارغة
 
             detections = self.tracker.update_with_detections(detections)
 
@@ -112,17 +113,17 @@ class ObjectTracker:
                 track_id = detections.tracker_id[i] if detections.tracker_id is not None else None
 
                 all_detections.append({
-                        "bbox": [x1, y1, x2, y2],
-                        "confidence": conf,
-                        "class_name": class_name,
-                        "track_id": track_id
+                    "bbox": [x1, y1, x2, y2],
+                    "confidence": float(conf),  # تحويل إلى float عادي
+                    "class_name": class_name,
+                    "track_id": track_id
                 })
 
             return all_detections
 
         except Exception as e:
             logger.error(f"❌ خطأ في كشف وتتبع الكائنات: {e}")
-            return sv.Detections.empty(), []
+            return []
 
     def cleanup(self):
         """تنظيف الموارد"""
